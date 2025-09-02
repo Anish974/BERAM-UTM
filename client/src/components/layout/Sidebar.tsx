@@ -30,7 +30,6 @@ export default function Sidebar({ collapsed = false }: SidebarProps) {
           )}
         </div>
       </div>
-      
       <nav className="flex-1 p-4">
         <ul className="space-y-2">
           {navigation.map((item) => {
@@ -56,14 +55,13 @@ export default function Sidebar({ collapsed = false }: SidebarProps) {
           })}
         </ul>
       </nav>
-      
       <div className="p-4 border-t border-border">
         <div className="flex items-center space-x-3">
           <div className="w-8 h-8 bg-secondary rounded-full flex items-center justify-center">
             <i className="fas fa-user text-xs" data-testid="user-avatar"></i>
           </div>
           <div className="flex-1 min-w-0">
-            <p className="text-sm font-medium truncate" data-testid="user-name">Operator Smith</p>
+            <p className="text-sm font-medium truncate" data-testid="user-name">Operator ANISH</p>
             <p className="text-xs text-muted-foreground" data-testid="user-role">ATC Controller</p>
           </div>
           <button 
