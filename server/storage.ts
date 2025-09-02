@@ -8,6 +8,7 @@ import {
   type Coordinate
 } from "@shared/schema";
 import { randomUUID } from "crypto";
+import { INDIA_BOUNDARY_GEOJSON, GeoJSONService } from "./services/geojson.js";
 
 export interface IStorage {
   // Users
@@ -54,11 +55,30 @@ export class MemStorage implements IStorage {
   private alerts: Map<string, Alert> = new Map();
 
   constructor() {
-    // Clean slate - no seed data for production
+    this.addIndiaRestrictedArea();
   }
 
   private seedData() {
     // No seed data - clean production environment
+  }
+
+  private addIndiaRestrictedArea() {
+    // Add real India boundary from GeoJSON data
+    const coordinates = GeoJSONService.convertGeoJSONToCoordinates(INDIA_BOUNDARY_GEOJSON);
+    const simplifiedCoordinates = GeoJSONService.simplifyCoordinates(coordinates, 50); // Simplify for performance
+    
+    const indiaRestrictedArea: Geofence = {
+      id: randomUUID(),
+      name: "India National Boundary - Restricted Airspace",
+      type: "restricted", 
+      coordinates: simplifiedCoordinates,
+      minAltitude: 0,
+      maxAltitude: 12000, // 12,000 ft national airspace limit
+      active: true,
+      createdAt: new Date(),
+    };
+
+    this.geofences.set(indiaRestrictedArea.id, indiaRestrictedArea);
   }
 
   // Users
