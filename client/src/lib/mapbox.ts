@@ -37,8 +37,8 @@ export async function initializeMap(container: HTMLElement) {
     const map = new mapboxgl.Map({
       container,
       style: "mapbox://styles/mapbox/satellite-v9",
-      center: [-122.4194, 37.7749], // San Francisco
-      zoom: 12,
+      center: [77.1025, 28.7041], // Delhi, India
+      zoom: 5,
       attributionControl: false,
     });
 
@@ -200,6 +200,62 @@ export function addMissionLayer(map: any, missions: any[]) {
           "line-color": "#3b82f6",
           "line-width": 3,
           "line-dasharray": [2, 2],
+        },
+      });
+    }
+  });
+}
+
+export function addGeofenceLayer(map: any, geofences: any[]) {
+  if (!map || !mapboxgl) return;
+
+  geofences.forEach((geofence) => {
+    if (!geofence.coordinates || geofence.coordinates.length < 3) return;
+
+    const polygon = {
+      type: "Feature",
+      properties: {
+        id: geofence.id,
+        name: geofence.name,
+        type: geofence.type,
+      },
+      geometry: {
+        type: "Polygon",
+        coordinates: [geofence.coordinates.map((coord: any) => [coord.lng, coord.lat])],
+      },
+    };
+
+    const sourceId = `geofence-${geofence.id}`;
+    const fillLayerId = `geofence-fill-${geofence.id}`;
+    const lineLayerId = `geofence-line-${geofence.id}`;
+
+    if (map.getSource(sourceId)) {
+      map.getSource(sourceId).setData(polygon);
+    } else {
+      map.addSource(sourceId, {
+        type: "geojson",
+        data: polygon,
+      });
+
+      // Add fill layer
+      map.addLayer({
+        id: fillLayerId,
+        type: "fill",
+        source: sourceId,
+        paint: {
+          "fill-color": geofence.type === "no_fly" ? "#ef4444" : "#f59e0b",
+          "fill-opacity": 0.3,
+        },
+      });
+
+      // Add outline layer
+      map.addLayer({
+        id: lineLayerId,
+        type: "line",
+        source: sourceId,
+        paint: {
+          "line-color": geofence.type === "no_fly" ? "#dc2626" : "#d97706",
+          "line-width": 2,
         },
       });
     }

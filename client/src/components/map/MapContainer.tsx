@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
-import { initializeMap } from "@/lib/mapbox";
+import { useQuery } from "@tanstack/react-query";
+import { initializeMap, addDroneLayer, addMissionLayer, addGeofenceLayer } from "@/lib/mapbox";
 import DroneMarker from "./DroneMarker";
 import MissionPath from "./MissionPath";
 import GeofenceZone from "./GeofenceZone";
@@ -16,39 +17,10 @@ export default function MapContainer({ drones, missions }: MapContainerProps) {
   const [isDrawing, setIsDrawing] = useState(false);
   const [drawMode, setDrawMode] = useState<'waypoints' | 'geofence' | null>(null);
 
-  // Mock geofences for display
-  const geofences: Geofence[] = [
-    {
-      id: "geo-1",
-      name: "No-Fly Zone",
-      type: "no_fly",
-      coordinates: [
-        { lat: 37.7849, lng: -122.4394 },
-        { lat: 37.7949, lng: -122.4394 },
-        { lat: 37.7949, lng: -122.4194 },
-        { lat: 37.7849, lng: -122.4194 }
-      ],
-      minAltitude: 0,
-      maxAltitude: 400,
-      active: true,
-      createdAt: new Date(),
-    },
-    {
-      id: "geo-2",
-      name: "Restricted Airspace",
-      type: "restricted",
-      coordinates: [
-        { lat: 37.7549, lng: -122.4494 },
-        { lat: 37.7649, lng: -122.4494 },
-        { lat: 37.7649, lng: -122.4294 },
-        { lat: 37.7549, lng: -122.4294 }
-      ],
-      minAltitude: 0,
-      maxAltitude: 200,
-      active: true,
-      createdAt: new Date(),
-    }
-  ];
+  // Fetch real geofences from API
+  const { data: geofences = [] } = useQuery<Geofence[]>({
+    queryKey: ["/api/geofences"],
+  });
 
   useEffect(() => {
     if (!mapContainer.current || map.current) return;
@@ -63,6 +35,15 @@ export default function MapContainer({ drones, missions }: MapContainerProps) {
       }
     };
   }, []);
+
+  // Update map layers when data changes
+  useEffect(() => {
+    if (!map.current) return;
+    
+    addDroneLayer(map.current, drones);
+    addMissionLayer(map.current, missions);
+    addGeofenceLayer(map.current, geofences);
+  }, [drones, missions, geofences]);
 
   const handleDrawWaypoints = () => {
     setDrawMode('waypoints');
@@ -93,8 +74,8 @@ export default function MapContainer({ drones, missions }: MapContainerProps) {
   const handleRecenter = () => {
     if (map.current) {
       map.current.flyTo({
-        center: [-122.4194, 37.7749],
-        zoom: 12
+        center: [77.1025, 28.7041], // Delhi, India
+        zoom: 5
       });
     }
   };
