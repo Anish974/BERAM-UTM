@@ -97,6 +97,33 @@ export default function Fleet() {
     });
   };
 
+  const handleCalibrateDrone = (drone: Drone) => {
+    toast({ 
+      title: "Calibration Started", 
+      description: `Calibrating ${drone.name}...` 
+    });
+    
+    updateDroneMutation.mutate({
+      id: drone.id,
+      updates: { 
+        status: "calibrating",
+        battery: Math.max((drone.battery || 0) - 5, 0) // Simulate battery usage during calibration
+      }
+    });
+    
+    // Simulate calibration completion after 3 seconds
+    setTimeout(() => {
+      updateDroneMutation.mutate({
+        id: drone.id,
+        updates: { status: "idle" }
+      });
+      toast({ 
+        title: "Calibration Complete", 
+        description: `${drone.name} is now calibrated and ready for missions` 
+      });
+    }, 3000);
+  };
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -276,9 +303,11 @@ export default function Fleet() {
                       <Button 
                         size="sm" 
                         variant="outline"
-                        data-testid="button-view-telemetry"
+                        onClick={() => handleCalibrateDrone(selectedDrone)}
+                        disabled={selectedDrone.status === "calibrating"}
+                        data-testid="button-calibrate-drone"
                       >
-                        Telemetry
+                        {selectedDrone.status === "calibrating" ? "Calibrating..." : "Calibrate"}
                       </Button>
                     </div>
                   </div>

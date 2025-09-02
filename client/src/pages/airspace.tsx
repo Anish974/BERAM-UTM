@@ -118,7 +118,7 @@ export default function Airspace() {
   };
 
   const handleAddGeofence = () => {
-    if (!newGeofence.name || !newGeofence.coordinates || newGeofence.coordinates.length < 3) {
+    if (!newGeofence.name || !newGeofence.coordinates || !Array.isArray(newGeofence.coordinates) || newGeofence.coordinates.length < 3) {
       toast({
         title: "Validation Error",
         description: "Please provide name and at least 3 coordinates",
@@ -366,7 +366,7 @@ export default function Airspace() {
                 <Input
                   id="min-altitude"
                   type="number"
-                  value={newGeofence.minAltitude}
+                  value={newGeofence.minAltitude || 0}
                   onChange={(e) => setNewGeofence(prev => ({ ...prev, minAltitude: parseInt(e.target.value) || 0 }))}
                   data-testid="input-min-altitude"
                 />
@@ -376,7 +376,7 @@ export default function Airspace() {
                 <Input
                   id="max-altitude"
                   type="number"
-                  value={newGeofence.maxAltitude}
+                  value={newGeofence.maxAltitude || 400}
                   onChange={(e) => setNewGeofence(prev => ({ ...prev, maxAltitude: parseInt(e.target.value) || 400 }))}
                   data-testid="input-max-altitude"
                 />
@@ -384,7 +384,7 @@ export default function Airspace() {
             </div>
             <div className="flex items-center space-x-2">
               <Switch 
-                checked={newGeofence.active}
+                checked={newGeofence.active || false}
                 onCheckedChange={(checked) => setNewGeofence(prev => ({ ...prev, active: checked }))}
                 data-testid="switch-geofence-active"
               />

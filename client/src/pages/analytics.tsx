@@ -173,7 +173,7 @@ export default function Analytics() {
                       {type}
                     </Badge>
                   </div>
-                  <span className="font-semibold">{count}</span>
+                  <span className="font-semibold">{String(count)}</span>
                 </div>
               ))}
               
@@ -246,7 +246,7 @@ export default function Analytics() {
                   <div key={severity} className="text-center">
                     <div className="text-xl font-bold">
                       <Badge className={getSeverityColor(severity)} data-testid={`alert-${severity}`}>
-                        {count}
+                        {String(count)}
                       </Badge>
                     </div>
                     <div className="text-sm text-muted-foreground capitalize">{severity}</div>
@@ -260,7 +260,7 @@ export default function Analytics() {
                   {alerts.slice(0, 5).map((alert: Alert) => (
                     <div key={alert.id} className="flex items-center justify-between text-sm p-2 bg-secondary rounded">
                       <span className="truncate">{alert.title}</span>
-                      <Badge className={getSeverityColor(alert.severity)} size="sm">
+                      <Badge className={getSeverityColor(alert.severity)}>
                         {alert.severity}
                       </Badge>
                     </div>

@@ -115,7 +115,7 @@ export default function Missions() {
                       <p>Type: {mission.type}</p>
                       <p>Drone: {mission.droneId || "Unassigned"}</p>
                       <p>Altitude: {mission.altitude}ft</p>
-                      {mission.progress !== undefined && (
+                      {mission.progress !== undefined && mission.progress !== null && (
                         <p>Progress: {Math.round(mission.progress)}%</p>
                       )}
                     </div>
