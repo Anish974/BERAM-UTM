@@ -16,7 +16,7 @@ async function loadMapbox() {
   }
 }
 
-export async function initializeMap(container: HTMLElement) {
+export async function initializeMap(container: HTMLElement, initialStyle = "mapbox://styles/mapbox/satellite-v9") {
   mapboxgl = await loadMapbox();
   
   if (!mapboxgl) {
@@ -36,7 +36,7 @@ export async function initializeMap(container: HTMLElement) {
 
     const map = new mapboxgl.Map({
       container,
-      style: "mapbox://styles/mapbox/satellite-v9",
+      style: initialStyle,
       center: [77.1025, 28.7041], // Delhi, India
       zoom: 5,
       attributionControl: false,
@@ -51,6 +51,22 @@ export async function initializeMap(container: HTMLElement) {
   } catch (error) {
     console.error("Failed to initialize Mapbox:", error);
     return createFallbackMap(container);
+  }
+}
+
+// Map style configurations
+export const MAP_STYLES = {
+  satellite: "mapbox://styles/mapbox/satellite-v9",
+  streets: "mapbox://styles/mapbox/streets-v11", 
+  light: "mapbox://styles/mapbox/light-v10",
+  dark: "mapbox://styles/mapbox/dark-v10",
+  outdoors: "mapbox://styles/mapbox/outdoors-v11",
+  navigation: "mapbox://styles/mapbox/navigation-day-v1"
+};
+
+export function changeMapStyle(map: any, style: string) {
+  if (map && map.setStyle) {
+    map.setStyle(style);
   }
 }
 
@@ -209,6 +225,9 @@ export function addMissionLayer(map: any, missions: any[]) {
 export function addGeofenceLayer(map: any, geofences: any[]) {
   if (!map || !mapboxgl) return;
 
+  // Remove existing geofence layers first
+  removeGeofenceLayers(map);
+
   geofences.forEach((geofence) => {
     if (!geofence.coordinates || geofence.coordinates.length < 3) return;
 
@@ -229,35 +248,77 @@ export function addGeofenceLayer(map: any, geofences: any[]) {
     const fillLayerId = `geofence-fill-${geofence.id}`;
     const lineLayerId = `geofence-line-${geofence.id}`;
 
-    if (map.getSource(sourceId)) {
-      map.getSource(sourceId).setData(polygon);
-    } else {
-      map.addSource(sourceId, {
-        type: "geojson",
-        data: polygon,
-      });
+    // Add source
+    map.addSource(sourceId, {
+      type: "geojson",
+      data: polygon,
+    });
 
-      // Add fill layer
-      map.addLayer({
-        id: fillLayerId,
-        type: "fill",
-        source: sourceId,
-        paint: {
-          "fill-color": geofence.type === "no_fly" ? "#ef4444" : "#f59e0b",
-          "fill-opacity": 0.3,
-        },
-      });
+    // Color based on geofence type
+    let fillColor, lineColor;
+    switch (geofence.type) {
+      case "no_fly":
+        fillColor = "#ef4444"; // Red
+        lineColor = "#dc2626";
+        break;
+      case "restricted":
+        fillColor = "#f59e0b"; // Orange
+        lineColor = "#d97706";
+        break;
+      default:
+        fillColor = "#8b5cf6"; // Purple for custom geofences
+        lineColor = "#7c3aed";
+    }
 
-      // Add outline layer
-      map.addLayer({
-        id: lineLayerId,
-        type: "line",
-        source: sourceId,
-        paint: {
-          "line-color": geofence.type === "no_fly" ? "#dc2626" : "#d97706",
-          "line-width": 2,
-        },
-      });
+    // Add fill layer
+    map.addLayer({
+      id: fillLayerId,
+      type: "fill",
+      source: sourceId,
+      paint: {
+        "fill-color": fillColor,
+        "fill-opacity": 0.2,
+      },
+    });
+
+    // Add outline layer
+    map.addLayer({
+      id: lineLayerId,
+      type: "line",
+      source: sourceId,
+      paint: {
+        "line-color": lineColor,
+        "line-width": 2,
+        "line-dasharray": geofence.type === "restricted" ? [5, 5] : undefined,
+      },
+    });
+  });
+}
+
+export function removeGeofenceLayers(map: any) {
+  if (!map) return;
+
+  // Get all layers and remove geofence-related ones
+  const layers = map.getStyle().layers;
+  layers.forEach((layer: any) => {
+    if (layer.id.startsWith('geofence-')) {
+      try {
+        map.removeLayer(layer.id);
+      } catch (e) {
+        // Layer might not exist
+      }
+    }
+  });
+
+  // Get all sources and remove geofence-related ones
+  const sources = map.getStyle().sources;
+  Object.keys(sources).forEach((sourceId) => {
+    if (sourceId.startsWith('geofence-')) {
+      try {
+        map.removeSource(sourceId);
+      } catch (e) {
+        // Source might not exist
+      }
     }
   });
 }

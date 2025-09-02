@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { initializeMap, addDroneLayer, addMissionLayer, addGeofenceLayer } from "@/lib/mapbox";
+import { initializeMap, addDroneLayer, addMissionLayer, addGeofenceLayer, changeMapStyle, MAP_STYLES } from "@/lib/mapbox";
+import MapLegend from "./MapLegend";
+import MapStyleSelector from "./MapStyleSelector";
 import DroneMarker from "./DroneMarker";
 import MissionPath from "./MissionPath";
 import GeofenceZone from "./GeofenceZone";
@@ -16,6 +18,14 @@ export default function MapContainer({ drones, missions }: MapContainerProps) {
   const map = useRef<any>(null);
   const [isDrawing, setIsDrawing] = useState(false);
   const [drawMode, setDrawMode] = useState<'waypoints' | 'geofence' | null>(null);
+  const [currentMapStyle, setCurrentMapStyle] = useState(MAP_STYLES.satellite);
+  const [visibleLayers, setVisibleLayers] = useState({
+    drones: true,
+    missions: true,
+    geofences: true,
+    noFlyZones: true,
+    restrictedZones: true,
+  });
 
   // Fetch real geofences from API
   const { data: geofences = [] } = useQuery<Geofence[]>({
@@ -40,10 +50,22 @@ export default function MapContainer({ drones, missions }: MapContainerProps) {
   useEffect(() => {
     if (!map.current) return;
     
-    addDroneLayer(map.current, drones);
-    addMissionLayer(map.current, missions);
-    addGeofenceLayer(map.current, geofences);
-  }, [drones, missions, geofences]);
+    if (visibleLayers.drones) {
+      addDroneLayer(map.current, drones);
+    }
+    if (visibleLayers.missions) {
+      addMissionLayer(map.current, missions);
+    }
+    if (visibleLayers.geofences || visibleLayers.restrictedZones || visibleLayers.noFlyZones) {
+      const filteredGeofences = geofences.filter(geofence => {
+        if (geofence.type === "no_fly" && !visibleLayers.noFlyZones) return false;
+        if (geofence.type === "restricted" && !visibleLayers.restrictedZones) return false;
+        if (geofence.type !== "no_fly" && geofence.type !== "restricted" && !visibleLayers.geofences) return false;
+        return true;
+      });
+      addGeofenceLayer(map.current, filteredGeofences);
+    }
+  }, [drones, missions, geofences, visibleLayers]);
 
   const handleDrawWaypoints = () => {
     setDrawMode('waypoints');
@@ -78,6 +100,24 @@ export default function MapContainer({ drones, missions }: MapContainerProps) {
         zoom: 5
       });
     }
+  };
+
+  const handleStyleChange = (style: string) => {
+    setCurrentMapStyle(style);
+    changeMapStyle(map.current, style);
+  };
+
+  const handleToggleLayer = (layerType: string, visible: boolean) => {
+    setVisibleLayers(prev => ({ ...prev, [layerType]: visible }));
+  };
+
+  // Calculate layer counts for legend
+  const layerCounts = {
+    drones: drones.length,
+    missions: missions.length,
+    geofences: geofences.filter(g => g.type !== "no_fly" && g.type !== "restricted").length,
+    noFlyZones: geofences.filter(g => g.type === "no_fly").length,
+    restrictedZones: geofences.filter(g => g.type === "restricted").length,
   };
 
   return (
@@ -119,6 +159,10 @@ export default function MapContainer({ drones, missions }: MapContainerProps) {
       
       {/* Map Controls */}
       <div className="absolute top-4 right-4 flex flex-col space-y-2">
+        <MapStyleSelector 
+          onStyleChange={handleStyleChange}
+          currentStyle={currentMapStyle}
+        />
         <button 
           className="w-10 h-10 bg-card border border-border rounded-md flex items-center justify-center hover:bg-secondary transition-colors"
           onClick={handleZoomIn}
@@ -140,6 +184,14 @@ export default function MapContainer({ drones, missions }: MapContainerProps) {
         >
           <i className="fas fa-crosshairs text-sm"></i>
         </button>
+      </div>
+
+      {/* Map Legend */}
+      <div className="absolute top-4 left-4">
+        <MapLegend 
+          onToggleLayer={handleToggleLayer}
+          layerCounts={layerCounts}
+        />
       </div>
       
       {/* Drawing Tools */}
