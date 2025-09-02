@@ -53,10 +53,12 @@ export default function MapContainer({ drones, missions }: MapContainerProps) {
   useEffect(() => {
     if (!mapContainer.current || map.current) return;
     
-    map.current = initializeMap(mapContainer.current);
+    initializeMap(mapContainer.current).then((mapInstance) => {
+      map.current = mapInstance;
+    });
     
     return () => {
-      if (map.current) {
+      if (map.current && typeof map.current.remove === 'function') {
         map.current.remove();
       }
     };

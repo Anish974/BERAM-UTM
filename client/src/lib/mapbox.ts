@@ -60,20 +60,27 @@ function createFallbackMap(container: HTMLElement) {
     zoomIn: () => console.log("Zoom in"),
     zoomOut: () => console.log("Zoom out"),
     flyTo: (options: any) => console.log("Fly to:", options),
-    remove: () => console.log("Map removed"),
+    remove: () => {
+      console.log("Map removed");
+      // Clear the container content if needed
+      if (container) {
+        container.innerHTML = '';
+      }
+    },
     on: () => {},
     off: () => {},
     addLayer: () => {},
     removeLayer: () => {},
     addSource: () => {},
     removeSource: () => {},
+    getSource: () => null,
   };
 }
 
 async function setupDrawingControls(map: any) {
   try {
     // Try to load Mapbox GL Draw
-    const MapboxDraw = await import("@mapbox/mapbox-gl-draw");
+    const MapboxDraw = await import("@mapbox/mapbox-gl-draw") as any;
     
     const draw = new MapboxDraw.default({
       displayControlsDefault: false,

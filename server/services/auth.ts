@@ -1,6 +1,10 @@
 import jwt from "jsonwebtoken";
 import type { Request, Response, NextFunction } from "express";
 
+interface AuthenticatedRequest extends Request {
+  userId?: string;
+}
+
 const JWT_SECRET = process.env.JWT_SECRET || "drone_utm_secret_key_2024";
 
 export function generateToken(userId: string): string {
@@ -15,7 +19,7 @@ export function verifyToken(token: string): { userId: string } | null {
   }
 }
 
-export function authenticateToken(req: Request, res: Response, next: NextFunction) {
+export function authenticateToken(req: AuthenticatedRequest, res: Response, next: NextFunction) {
   const authHeader = req.headers.authorization;
   const token = authHeader && authHeader.split(" ")[1];
 
@@ -28,6 +32,6 @@ export function authenticateToken(req: Request, res: Response, next: NextFunctio
     return res.status(403).json({ message: "Invalid or expired token" });
   }
 
-  (req as any).userId = payload.userId;
+  req.userId = payload.userId;
   next();
 }

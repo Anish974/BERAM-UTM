@@ -2,8 +2,8 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { setupWebSocket } from "./services/websocket";
-import { authenticateToken, generateToken } from "./services/auth";
-import { insertUserSchema, insertMissionSchema, insertGeofenceSchema } from "@shared/schema";
+import { authenticateToken, generateToken } from "./services/auth.js";
+import { insertUserSchema, insertMissionSchema, insertGeofenceSchema, type Waypoint } from "@shared/schema";
 import { WebSocketServer } from "ws";
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -181,7 +181,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         
         // Simple point-in-polygon check for each waypoint
         for (const waypoint of waypoints) {
-          if (isPointInPolygon(waypoint, geofence.coordinates) &&
+          if (isPointInPolygon(waypoint, geofence.coordinates as Array<{lat: number, lng: number}>) &&
               altitude >= geofence.minAltitude! &&
               altitude <= geofence.maxAltitude!) {
             conflicts.push({
@@ -250,7 +250,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 }
 
 // Simple point-in-polygon algorithm
-function isPointInPolygon(point: {lat: number, lng: number}, polygon: Array<{lat: number, lng: number}>): boolean {
+function isPointInPolygon(point: Waypoint, polygon: Array<{lat: number, lng: number}>): boolean {
   let inside = false;
   const x = point.lng;
   const y = point.lat;

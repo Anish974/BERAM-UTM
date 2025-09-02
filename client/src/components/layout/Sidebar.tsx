@@ -32,8 +32,8 @@ export default function Sidebar() {
             return (
               <li key={item.name}>
                 <Link href={item.href}>
-                  <a 
-                    className={`flex items-center space-x-3 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                  <div 
+                    className={`flex items-center space-x-3 px-3 py-2 rounded-md text-sm font-medium transition-colors cursor-pointer ${
                       isActive 
                         ? "bg-primary text-primary-foreground" 
                         : "text-muted-foreground hover:bg-secondary hover:text-foreground"
@@ -42,7 +42,7 @@ export default function Sidebar() {
                   >
                     <i className={`fas fa-${item.icon} w-4 h-4`}></i>
                     <span>{item.name}</span>
-                  </a>
+                  </div>
                 </Link>
               </li>
             );

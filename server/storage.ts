@@ -4,7 +4,8 @@ import {
   type Mission, type InsertMission,
   type Telemetry, type InsertTelemetry,
   type Geofence, type InsertGeofence,
-  type Alert, type InsertAlert
+  type Alert, type InsertAlert,
+  type Coordinate
 } from "@shared/schema";
 import { randomUUID } from "crypto";
 
@@ -120,7 +121,7 @@ export class MemStorage implements IStorage {
         { lat: 37.7949, lng: -122.4394 },
         { lat: 37.7949, lng: -122.4194 },
         { lat: 37.7849, lng: -122.4194 }
-      ],
+      ] as Coordinate[],
       minAltitude: 0,
       maxAltitude: 400,
       active: true,
@@ -136,7 +137,7 @@ export class MemStorage implements IStorage {
         { lat: 37.7649, lng: -122.4494 },
         { lat: 37.7649, lng: -122.4294 },
         { lat: 37.7549, lng: -122.4294 }
-      ],
+      ] as Coordinate[],
       minAltitude: 0,
       maxAltitude: 200,
       active: true,
@@ -175,6 +176,7 @@ export class MemStorage implements IStorage {
     const user: User = { 
       ...insertUser, 
       id, 
+      role: insertUser.role || "operator",
       createdAt: new Date() 
     };
     this.users.set(id, user);
@@ -193,6 +195,14 @@ export class MemStorage implements IStorage {
   async createDrone(insertDrone: InsertDrone): Promise<Drone> {
     const drone: Drone = {
       ...insertDrone,
+      status: insertDrone.status || "offline",
+      battery: insertDrone.battery || 0,
+      speed: insertDrone.speed || null,
+      heading: insertDrone.heading || null,
+      latitude: insertDrone.latitude || null,
+      longitude: insertDrone.longitude || null,
+      altitude: insertDrone.altitude || null,
+      signalStrength: insertDrone.signalStrength || null,
       createdAt: new Date(),
       lastSeen: new Date(),
     };
@@ -223,6 +233,13 @@ export class MemStorage implements IStorage {
     const mission: Mission = {
       ...insertMission,
       id,
+      status: insertMission.status || "planned",
+      description: insertMission.description || null,
+      droneId: insertMission.droneId || null,
+      speed: insertMission.speed || null,
+      geofences: insertMission.geofences || null,
+      startTime: null,
+      endTime: null,
       progress: 0,
       createdAt: new Date(),
       updatedAt: new Date(),
@@ -287,6 +304,9 @@ export class MemStorage implements IStorage {
     const geofence: Geofence = {
       ...insertGeofence,
       id,
+      minAltitude: insertGeofence.minAltitude || 0,
+      maxAltitude: insertGeofence.maxAltitude || 400,
+      active: insertGeofence.active ?? true,
       createdAt: new Date(),
     };
     this.geofences.set(id, geofence);
@@ -320,6 +340,7 @@ export class MemStorage implements IStorage {
     const alert: Alert = {
       ...insertAlert,
       id,
+      droneId: insertAlert.droneId || null,
       acknowledged: false,
       createdAt: new Date(),
     };
