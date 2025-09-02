@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import AppLayout from "@/components/layout/AppLayout";
 import type { Drone, InsertDrone } from "@shared/schema";
 
 export default function Fleet() {
@@ -105,7 +106,8 @@ export default function Fleet() {
   }
 
   return (
-    <div className="p-6 space-y-6">
+    <AppLayout>
+      <div className="p-6 space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-3xl font-bold" data-testid="fleet-title">Fleet Management</h1>
         <Button onClick={() => setShowAddDrone(true)} data-testid="button-add-drone">
@@ -347,6 +349,7 @@ export default function Fleet() {
           </div>
         </DialogContent>
       </Dialog>
-    </div>
+      </div>
+    </AppLayout>
   );
 }

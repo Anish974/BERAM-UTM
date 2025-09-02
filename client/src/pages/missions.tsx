@@ -5,6 +5,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import AppLayout from "@/components/layout/AppLayout";
 import type { Mission } from "@shared/schema";
 
 export default function Missions() {
@@ -75,7 +76,8 @@ export default function Missions() {
   }
 
   return (
-    <div className="p-6 space-y-6">
+    <AppLayout>
+      <div className="p-6 space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-3xl font-bold" data-testid="missions-title">Mission Management</h1>
         <Button data-testid="button-new-mission">
@@ -225,6 +227,7 @@ export default function Missions() {
           </Card>
         </div>
       </div>
-    </div>
+      </div>
+    </AppLayout>
   );
 }

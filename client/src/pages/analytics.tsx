@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import AppLayout from "@/components/layout/AppLayout";
 import type { Mission, Drone, Alert } from "@shared/schema";
 
 export default function Analytics() {
@@ -73,7 +74,8 @@ export default function Analytics() {
   };
 
   return (
-    <div className="p-6 space-y-6">
+    <AppLayout>
+      <div className="p-6 space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-3xl font-bold" data-testid="analytics-title">Analytics Dashboard</h1>
         <div className="text-sm text-muted-foreground">
@@ -312,6 +314,7 @@ export default function Analytics() {
           </div>
         </CardContent>
       </Card>
-    </div>
+      </div>
+    </AppLayout>
   );
 }

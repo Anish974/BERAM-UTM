@@ -10,6 +10,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Switch } from "@/components/ui/switch";
+import AppLayout from "@/components/layout/AppLayout";
 import type { Geofence, InsertGeofence, Coordinate } from "@shared/schema";
 
 export default function Airspace() {
@@ -144,7 +145,8 @@ export default function Airspace() {
   }
 
   return (
-    <div className="p-6 space-y-6">
+    <AppLayout>
+      <div className="p-6 space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-3xl font-bold" data-testid="airspace-title">Airspace Management</h1>
         <Button onClick={() => setShowAddGeofence(true)} data-testid="button-add-geofence">
@@ -427,6 +429,7 @@ export default function Airspace() {
           </div>
         </DialogContent>
       </Dialog>
-    </div>
+      </div>
+    </AppLayout>
   );
 }

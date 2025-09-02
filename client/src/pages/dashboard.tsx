@@ -1,5 +1,5 @@
 import { useState } from "react";
-import Sidebar from "@/components/layout/Sidebar";
+import AppLayout from "@/components/layout/AppLayout";
 import TopBar from "@/components/layout/TopBar";
 import MapContainer from "@/components/map/MapContainer";
 import TelemetryFeed from "@/components/telemetry/TelemetryFeed";
@@ -13,9 +13,7 @@ export default function Dashboard() {
   const { isConnected, drones, telemetry, missions, alerts } = useWebSocket();
 
   return (
-    <div className="min-h-screen flex bg-background text-foreground">
-      <Sidebar />
-      
+    <AppLayout>
       <div className="flex-1 flex flex-col">
         <TopBar 
           isConnected={isConnected}
@@ -42,6 +40,6 @@ export default function Dashboard() {
           availableDrones={drones.filter(d => d.status === "idle" || d.status === "active")}
         />
       )}
-    </div>
+    </AppLayout>
   );
 }

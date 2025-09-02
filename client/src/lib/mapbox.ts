@@ -24,16 +24,12 @@ export async function initializeMap(container: HTMLElement) {
     return createFallbackMap(container);
   }
 
-  console.log("All env vars:", import.meta.env);
   const accessToken = import.meta.env.VITE_MAPBOX_ACCESS_TOKEN;
-  console.log("Raw token value:", accessToken, "Type:", typeof accessToken);
   
   if (!accessToken) {
-    console.warn("Mapbox access token not found, using fallback. Token:", accessToken);
+    console.warn("Mapbox access token not found, using fallback");
     return createFallbackMap(container);
   }
-
-  console.log("Initializing Mapbox with token:", accessToken ? "Token found" : "No token");
 
   try {
     mapboxgl.accessToken = accessToken;

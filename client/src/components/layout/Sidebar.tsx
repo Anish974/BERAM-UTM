@@ -8,20 +8,26 @@ const navigation = [
   { name: "Analytics", href: "/analytics", icon: "chart-line" },
 ];
 
-export default function Sidebar() {
+interface SidebarProps {
+  collapsed?: boolean;
+}
+
+export default function Sidebar({ collapsed = false }: SidebarProps) {
   const [location] = useLocation();
 
   return (
-    <div className="w-64 bg-card border-r border-border flex flex-col">
+    <div className="h-screen bg-card border-r border-border flex flex-col sticky top-0">
       <div className="p-4 border-b border-border">
         <div className="flex items-center space-x-3">
           <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
             <i className="fas fa-drone text-primary-foreground text-sm" data-testid="logo-icon"></i>
           </div>
-          <div>
-            <h1 className="text-lg font-semibold" data-testid="app-title">Drone UTM</h1>
-            <p className="text-xs text-muted-foreground" data-testid="app-subtitle">Command Center</p>
-          </div>
+          {!collapsed && (
+            <div>
+              <h1 className="text-lg font-semibold" data-testid="app-title">Drone UTM</h1>
+              <p className="text-xs text-muted-foreground" data-testid="app-subtitle">Command Center</p>
+            </div>
+          )}
         </div>
       </div>
       
@@ -33,15 +39,16 @@ export default function Sidebar() {
               <li key={item.name}>
                 <Link href={item.href}>
                   <div 
-                    className={`flex items-center space-x-3 px-3 py-2 rounded-md text-sm font-medium transition-colors cursor-pointer ${
+                    className={`flex items-center ${collapsed ? 'justify-center' : 'space-x-3'} px-3 py-2 rounded-md text-sm font-medium transition-colors cursor-pointer ${
                       isActive 
                         ? "bg-primary text-primary-foreground" 
                         : "text-muted-foreground hover:bg-secondary hover:text-foreground"
                     }`}
                     data-testid={`nav-${item.name.toLowerCase().replace(' ', '-')}`}
+                    title={collapsed ? item.name : undefined}
                   >
                     <i className={`fas fa-${item.icon} w-4 h-4`}></i>
-                    <span>{item.name}</span>
+                    {!collapsed && <span>{item.name}</span>}
                   </div>
                 </Link>
               </li>
