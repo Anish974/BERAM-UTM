@@ -54,112 +54,11 @@ export class MemStorage implements IStorage {
   private alerts: Map<string, Alert> = new Map();
 
   constructor() {
-    this.seedData();
+    // Clean slate - no seed data for production
   }
 
   private seedData() {
-    // Seed some initial drones
-    const drone1: Drone = {
-      id: "DRN-001",
-      name: "Scout Alpha",
-      model: "DJI Mavic 3",
-      status: "active",
-      battery: 87,
-      latitude: 37.7749,
-      longitude: -122.4194,
-      altitude: 120,
-      speed: 25,
-      heading: 45,
-      signalStrength: -65,
-      lastSeen: new Date(),
-      createdAt: new Date(),
-    };
-
-    const drone2: Drone = {
-      id: "DRN-002",
-      name: "Survey Beta",
-      model: "DJI Phantom 4",
-      status: "mission",
-      battery: 65,
-      latitude: 37.7849,
-      longitude: -122.4094,
-      altitude: 85,
-      speed: 18,
-      heading: 120,
-      signalStrength: -58,
-      lastSeen: new Date(),
-      createdAt: new Date(),
-    };
-
-    const drone3: Drone = {
-      id: "DRN-003",
-      name: "Patrol Gamma",
-      model: "Autel EVO II",
-      status: "warning",
-      battery: 23,
-      latitude: 37.7649,
-      longitude: -122.4294,
-      altitude: 200,
-      speed: 32,
-      heading: 270,
-      signalStrength: -72,
-      lastSeen: new Date(),
-      createdAt: new Date(),
-    };
-
-    this.drones.set(drone1.id, drone1);
-    this.drones.set(drone2.id, drone2);
-    this.drones.set(drone3.id, drone3);
-
-    // Seed some geofences
-    const noFlyZone: Geofence = {
-      id: randomUUID(),
-      name: "Airport No-Fly Zone",
-      type: "no_fly",
-      coordinates: [
-        { lat: 37.7849, lng: -122.4394 },
-        { lat: 37.7949, lng: -122.4394 },
-        { lat: 37.7949, lng: -122.4194 },
-        { lat: 37.7849, lng: -122.4194 }
-      ] as Coordinate[],
-      minAltitude: 0,
-      maxAltitude: 400,
-      active: true,
-      createdAt: new Date(),
-    };
-
-    const restrictedZone: Geofence = {
-      id: randomUUID(),
-      name: "Military Base Restricted",
-      type: "restricted",
-      coordinates: [
-        { lat: 37.7549, lng: -122.4494 },
-        { lat: 37.7649, lng: -122.4494 },
-        { lat: 37.7649, lng: -122.4294 },
-        { lat: 37.7549, lng: -122.4294 }
-      ] as Coordinate[],
-      minAltitude: 0,
-      maxAltitude: 200,
-      active: true,
-      createdAt: new Date(),
-    };
-
-    this.geofences.set(noFlyZone.id, noFlyZone);
-    this.geofences.set(restrictedZone.id, restrictedZone);
-
-    // Seed an alert
-    const lowBatteryAlert: Alert = {
-      id: randomUUID(),
-      droneId: "DRN-003",
-      type: "battery_low",
-      severity: "warning",
-      title: "Low Battery Warning",
-      message: "DRN-003 battery at 23%. Return to base recommended.",
-      acknowledged: false,
-      createdAt: new Date(),
-    };
-
-    this.alerts.set(lowBatteryAlert.id, lowBatteryAlert);
+    // No seed data - clean production environment
   }
 
   // Users
