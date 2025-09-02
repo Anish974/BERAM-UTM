@@ -24,7 +24,7 @@ export default function Sidebar({ collapsed = false }: SidebarProps) {
           </div>
           {!collapsed && (
             <div>
-              <h1 className="text-lg font-semibold" data-testid="app-title">Drone UTM</h1>
+              <h1 className="text-lg font-semibold" data-testid="app-title">BERAM UTM</h1>
               <p className="text-xs text-muted-foreground" data-testid="app-subtitle">Command Center</p>
             </div>
           )}
